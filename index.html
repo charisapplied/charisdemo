@@ -243,6 +243,18 @@
   .result{margin-top:6px;border:1px solid var(--line);border-radius:12px;background:rgba(184,134,47,.05);padding:15px 16px;color:var(--paper);line-height:1.55}
   .demo-more{margin:22px 4px 2px;padding-top:18px;border-top:1px solid var(--line-soft);font-family:"Fraunces",serif;font-size:16px;font-style:italic;line-height:1.5;color:var(--paper-dim);opacity:0;animation:rise .5s .1s forwards}
   .demo-more b{font-style:normal;color:var(--champagne);font-weight:600}
+  .reachform{margin:6px 0 0;display:flex;flex-direction:column;gap:11px;max-width:560px}
+  .reachform .frow{display:flex;gap:11px;flex-wrap:wrap}
+  .reachform .frow input{flex:1;min-width:150px}
+  .reachform input,.reachform textarea{font-family:inherit;font-size:15px;color:var(--paper);background:var(--ink);border:1px solid var(--line);border-radius:11px;padding:13px 15px;width:100%;resize:vertical}
+  .reachform input::placeholder,.reachform textarea::placeholder{color:var(--mute-2)}
+  .reachform input:focus,.reachform textarea:focus{outline:none;border-color:var(--gold)}
+  .reachform .btn{align-self:flex-start;margin-top:4px}
+  .reachform .hp{position:absolute;left:-9999px}
+  .reach-thanks{font-size:16px;line-height:1.6;color:var(--paper);border-left:2px solid var(--gold);padding-left:16px;max-width:520px}
+  .reach-thanks a,.reach-alt a{color:var(--champagne);text-decoration:none}
+  .reach-thanks a:hover,.reach-alt a:hover{color:var(--gold-bright)}
+  .reach-alt{font-size:13px;color:var(--mute);margin:18px 0 0}
   .typing-dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin:0 2px;animation:bb 1.1s infinite}
   .typing-dots span:nth-child(2){animation-delay:.15s}.typing-dots span:nth-child(3){animation-delay:.3s}
   @keyframes bb{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
@@ -369,6 +381,7 @@
 
     <div class="next">
       <button class="btn" onclick="showDemo()">See it work →</button>
+      <button class="btn ghost" onclick="showReach()">Talk to us</button>
       <button class="btn ghost" onclick="go('s0')">Ask something else</button>
     </div>
   </section>
@@ -377,16 +390,42 @@
   <section id="s3" class="screen">
     <button class="back" onclick="go('s0')">← back</button>
     <div class="eyebrow">Live walkthrough</div>
-    <div class="demo-h">Pick your world. Watch Applied Intelligence go to work.</div>
-    <p class="demo-s">A scripted preview of Applied Intelligence turning one real moment into a win — start to finish. No slides, no buzzwords.</p>
-    <div class="ind-grid" id="indGrid"></div>
+    <div class="demo-h">Type your world. Watch Applied Intelligence go to work.</div>
+    <p class="demo-s">Enter any business — you'll get a live walkthrough of one real moment turned into a win. No slides, no buzzwords.</p>
+    <div class="inrow" style="max-width:680px;margin-bottom:8px">
+      <input id="demoIn" type="text" placeholder="e.g. a dental clinic, my coffee cart, a law firm…" autocomplete="off">
+      <button class="btn" onclick="startDemo()">Watch it →</button>
+    </div>
     <div class="stage" id="stage">
       <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="t" id="stageT">charis · working</span></div>
       <div class="body" id="stageBody"></div>
     </div>
     <div class="next">
-      <button class="btn" onclick="go('sC')">Explain it instead →</button>
+      <button class="btn" onclick="showReach()">See how it would change my business →</button>
+      <button class="btn ghost" onclick="go('sC')">Explain it instead</button>
     </div>
+  </section>
+
+  <!-- ============ SCREEN R : REACH OUT (lead capture) ============ -->
+  <section id="sR" class="screen">
+    <button class="back" onclick="go('s0')">← back</button>
+    <div class="eyebrow">Go deeper</div>
+    <div class="demo-h">See exactly how Applied Intelligence would change your business.</div>
+    <p class="demo-s">Not a sales pitch — a real, specific picture: the workflows worth building first, what they're worth, and a plan built around how you actually operate. Tell us where to start.</p>
+    <div id="reachWrap">
+      <form name="reach-out" id="reachForm" class="reachform" data-netlify="true" netlify-honeypot="bot-field" onsubmit="return submitReach(event)">
+        <input type="hidden" name="form-name" value="reach-out">
+        <p class="hp"><label>Leave this empty <input name="bot-field"></label></p>
+        <div class="frow">
+          <input name="name" type="text" placeholder="Your name" required autocomplete="name">
+          <input name="email" type="email" placeholder="Email" required autocomplete="email">
+        </div>
+        <input name="business" type="text" placeholder="Your business or industry" required>
+        <textarea name="message" rows="3" placeholder="What would you want it to fix or win first? (optional)"></textarea>
+        <button class="btn" type="submit">Send — show me the full picture →</button>
+      </form>
+    </div>
+    <p class="reach-alt">Prefer email? <a href="mailto:office@charisappliedintelligence.com?subject=How%20Applied%20Intelligence%20can%20help%20my%20business">office@charisappliedintelligence.com</a></p>
   </section>
 
   <footer>
@@ -768,37 +807,35 @@ const DEMO_SCRIPT={
   ]
 };
 
-function buildIndGrid(){
-  const g=document.getElementById('indGrid'); g.innerHTML='';
-  INDUSTRIES.forEach(ind=>{
-    const b=document.createElement('button'); b.className='ind';
-    b.onclick=()=>runDemo(ind);
-    b.innerHTML=`<div class="in">${ind.n}</div><div class="id">${ind.d}</div>`;
-    g.appendChild(b);
-  });
-}
+/* map free text to one of the polished built-in scripts */
+const DEMO_KW=[
+  {kw:["ecommerce","e-commerce","e commerce","shopify","online store","online shop","dtc","d2c","webstore","amazon seller"], id:"ecom"},
+  {kw:["coworking","co-working","shared office","office space","workspace","regus","wework","serviced office","flexible office"], id:"cowork"},
+  {kw:["restaurant","food","cafe","diner","bar","kitchen","catering","eatery","bistro","cloud kitchen"], id:"food"},
+  {kw:["airbnb","vacation rental","staycation","short-term rental","short term rental","str","vrbo","vacation home","holiday let","homestay"], id:"stay"},
+  {kw:["construction","builder","architect","contractor","developer","real estate","realty","homes","property","renovation","civil"], id:"build"},
+  {kw:["clothing","apparel","fashion","boutique","clothes","garment","outfit","label"], id:"cloth"},
+  {kw:["influencer","creator","content creator","youtuber","blogger","streamer"], id:"infl"},
+  {kw:["celebrity","aspiring","actor","actress","artist","musician","singer","performer","model","aspirant","dancer"], id:"celeb"}
+];
 
 let demoTimers=[];
 function clearDemo(){ demoTimers.forEach(t=>clearTimeout(t)); demoTimers=[]; }
 
-function runDemo(ind){
+function playDemo(steps, titleText){
   clearDemo();
   const stage=document.getElementById('stage');
   const body=document.getElementById('stageBody');
-  document.getElementById('stageT').textContent=ind.t;
+  document.getElementById('stageT').textContent=titleText||'applied intelligence · working';
   stage.classList.add('show');
   body.innerHTML='';
-  const steps=DEMO_SCRIPT[ind.id];
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   stage.scrollIntoView({behavior:'smooth',block:'center'});
-
   let delay=reduce?0:350;
-  steps.forEach((s,idx)=>{
+  steps.forEach((s)=>{
     demoTimers.push(setTimeout(()=>{
-      // show a brief "thinking" shimmer before work/done steps
       const el=document.createElement('div');
       el.className='step '+s.type;
-      el.style.animationDelay='0s';
       const icon = s.type==='in' ? '→' : (s.type==='work' ? '◆' : '✓');
       let inner=`<div class="ic">${icon}</div><div class="sx"><div class="sl">${s.l}</div><div class="st">${s.t}</div>`;
       if(s.result){ inner+=`<div class="result">${s.result}</div>`; }
@@ -809,17 +846,77 @@ function runDemo(ind){
     }, delay));
     delay += reduce?0:(s.type==='done'?1100:950);
   });
-  // closing line: this is just one workflow
   demoTimers.push(setTimeout(()=>{
     const more=document.createElement('div');
     more.className='demo-more';
-    more.innerHTML=`This is just <b>one</b> workflow. Applied Intelligence builds dozens like it around your business — imagine what more it could win for you.`;
+    more.innerHTML=`That was <b>one</b> moment — running at a fraction of its power. Now picture it unleashed across your whole business: every lead, every customer, every decision moving in your favor at once. What you just watched is the floor, not the ceiling.`;
     body.appendChild(more);
     more.scrollIntoView({behavior:'smooth',block:'nearest'});
   }, delay));
 }
 
-function showDemo(){ buildIndGrid(); go('s3'); document.getElementById('stage').classList.remove('show'); }
+function demoBar(raw){ return 'applied intelligence · '+raw.slice(0,26).toLowerCase(); }
+
+async function startDemo(){
+  const inp=document.getElementById('demoIn');
+  const raw=(inp.value||'').trim();
+  if(!raw){inp.focus();return;}
+  const v=raw.toLowerCase();
+
+  // 1) instant — polished built-in script for common worlds
+  for(const r of DEMO_KW){
+    if(r.kw.some(k=>v.includes(k))){
+      const ind=INDUSTRIES.find(i=>i.id===r.id);
+      playDemo(DEMO_SCRIPT[r.id], ind?ind.t:demoBar(raw));
+      return;
+    }
+  }
+
+  // 2) live — generate a walkthrough for anything else
+  clearDemo();
+  const stage=document.getElementById('stage');
+  const body=document.getElementById('stageBody');
+  document.getElementById('stageT').textContent=demoBar(raw);
+  stage.classList.add('show');
+  body.innerHTML=`<div class="step work"><div class="ic">◆</div><div class="sx"><div class="sl">Charis</div><div class="st"><span class="thinking">Building your walkthrough<span class="td"><span></span><span></span><span></span></span></span></div></div></div>`;
+  stage.scrollIntoView({behavior:'smooth',block:'center'});
+  try{
+    const res=await fetch(CHARIS_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({business:raw, mode:'demo'})});
+    if(!res.ok) throw new Error('status '+res.status);
+    const data=await res.json();
+    if(!data || !Array.isArray(data.steps) || !data.steps.length) throw new Error('no steps');
+    const steps=data.steps.map(s=>({type:s.type||'work', l:s.l||s.label||'Charis', t:s.t||s.text||'', result:s.result||''}));
+    playDemo(steps, demoBar(raw));
+  }catch(err){
+    // never dead-end — generic walkthrough
+    playDemo([
+      {type:'in', l:'Incoming', t:`A real moment lands in your day — the kind you'd normally handle on the fly.`},
+      {type:'work', l:'Charis', t:'Applied Intelligence reads it, finds where the money or the decision actually is, and acts on it in your voice.'},
+      {type:'done', l:'Result', t:'The moment turns into a win you would have left on the table.', result:'<b>One real outcome, handled end to end.</b> Imagine this across every moment in your day.'}
+    ], demoBar(raw));
+  }
+}
+
+function showDemo(){
+  go('s3');
+  const stage=document.getElementById('stage'); stage.classList.remove('show');
+  const inp=document.getElementById('demoIn'); if(inp) inp.value='';
+}
+
+function showReach(){ go('sR'); const f=document.getElementById('reachForm'); if(f) try{f.reset();}catch(e){} }
+
+function submitReach(e){
+  e.preventDefault();
+  const form=document.getElementById('reachForm');
+  const wrap=document.getElementById('reachWrap');
+  const body=new URLSearchParams(new FormData(form)).toString();
+  const done=()=>{ wrap.innerHTML='<div class="reach-thanks">Thank you — we\'ll be in touch shortly with a picture built around your business. You can also reach us anytime at <a href="mailto:office@charisappliedintelligence.com">office@charisappliedintelligence.com</a>.</div>'; };
+  fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}).then(done).catch(done);
+  return false;
+}
+
+/* enter key on the demo box */
+(function(){ const di=document.getElementById('demoIn'); if(di) di.addEventListener('keydown',e=>{if(e.key==='Enter')startDemo();}); })();
 
 /* deep-link: #demo opens demo */
 if(location.hash==='#demo'){ showDemo(); }
