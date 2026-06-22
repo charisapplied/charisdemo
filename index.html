@@ -625,6 +625,15 @@ function bizNext(){
   rs.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
+/* whole-word keyword match — prevents short keywords (e.g. "str") matching inside longer words ("industrialist") */
+function kwHit(text, kws){
+  for(const k of kws){
+    const esc=k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    if(new RegExp('(^|[^a-z0-9])'+esc+'([^a-z0-9]|$)','i').test(text)) return true;
+  }
+  return false;
+}
+
 async function runBiz(region){
   document.querySelectorAll('#regionStep .rbtn').forEach(b=>b.classList.toggle('on', b.textContent===region));
   const out=document.getElementById('bizOut');
@@ -632,7 +641,7 @@ async function runBiz(region){
 
   // 1) instant — common industries answer with zero latency, fully on-brand
   let match=null;
-  for(const r of BIZ_RULES){ if(r.kw.some(k=>BIZ_TEXT.includes(k))){match=r.out;break;} }
+  for(const r of BIZ_RULES){ if(kwHit(BIZ_TEXT, r.kw)){match=r.out;break;} }
   if(match){
     out.innerHTML=match+(REGION_MOD[region]||'');
     out.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -690,7 +699,7 @@ function runFlow(){
   const out=document.getElementById('flowOut');
   if(!v){document.getElementById('flowIn').focus();return;}
   let match=null;
-  for(const r of FLOW_CFG.rules){ if(r.kw.some(k=>v.includes(k))){match=r.out;break;} }
+  for(const r of FLOW_CFG.rules){ if(kwHit(v, r.kw)){match=r.out;break;} }
   out.innerHTML=match||FLOW_CFG.def;
   out.classList.add('show');
   out.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -865,7 +874,7 @@ async function startDemo(){
 
   // 1) instant — polished built-in script for common worlds
   for(const r of DEMO_KW){
-    if(r.kw.some(k=>v.includes(k))){
+    if(kwHit(v, r.kw)){
       const ind=INDUSTRIES.find(i=>i.id===r.id);
       playDemo(DEMO_SCRIPT[r.id], ind?ind.t:demoBar(raw));
       return;
