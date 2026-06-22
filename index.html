@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark only">
+<meta name="theme-color" content="#0F1419">
+<title>Charis · Applied Intelligence</title>
+<meta name="description" content="One question, explained for whoever's asking. From a curious teenager to a Fortune 500 CEO — see what AI is, why it matters to you, and what Charis does differently.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme:dark;
+    --ink:#0F1419;
+    --ink-2:#141B22;
+    --panel:#171F27;
+    --panel-2:#1C2630;
+    --line:rgba(184,134,47,.16);
+    --line-soft:rgba(255,255,255,.07);
+    --gold:#B8862F;
+    --gold-bright:#D8AC55;
+    --champagne:#E7D2A4;
+    --paper:#F2ECE0;
+    --paper-dim:#C9C5BC;
+    --mute:#8A9099;
+    --mute-2:#6B7280;
+    --ok:#7FB99A;
+    --radius:18px;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background-color:#0F1419}
+  #bg{position:fixed;inset:0;z-index:0;background:#0F1419;pointer-events:none}
+  body{
+    background-color:#0F1419;
+    color:var(--paper);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:28px 22px 80px;position:relative;z-index:1;
+    background-color:#0F1419;
+    background-image:
+      radial-gradient(1200px 600px at 50% -10%, rgba(184,134,47,.10), transparent 60%),
+      radial-gradient(900px 700px at 90% 110%, rgba(184,134,47,.05), transparent 55%);
+    background-repeat:no-repeat}
+  .eyebrow{
+    font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--gold);font-weight:600;
+  }
+  /* ---------- Brand mark ---------- */
+  .brandbar{display:flex;align-items:center;gap:13px;margin-bottom:54px}
+  .medallion{width:42px;height:42px;flex:none}
+  .brandname{font-family:"Fraunces",serif;font-weight:500;font-size:19px;letter-spacing:.01em;color:var(--paper)}
+  .brandname small{display:block;font-family:"Inter",sans-serif;font-weight:500;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--mute);margin-top:1px}
+
+  /* ---------- Screens ---------- */
+  .screen{display:none;animation:rise .55s cubic-bezier(.2,.7,.2,1) both}
+  .screen.active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  h1.hero{
+    font-family:"Fraunces",serif;font-weight:400;
+    font-size:clamp(34px,6.4vw,62px);line-height:1.04;letter-spacing:-.01em;
+    margin:18px 0 14px;color:var(--paper);
+  }
+  h1.hero em{font-style:italic;color:var(--champagne)}
+  .sub{font-size:clamp(15px,2.2vw,18px);color:var(--paper-dim);max-width:46ch;margin:0 0 38px}
+
+  /* ---------- Prompt cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  @media(max-width:680px){.cards{grid-template-columns:1fr}}
+  .card{
+    text-align:left;cursor:pointer;border:1px solid var(--line);
+    background:linear-gradient(180deg,var(--panel),var(--ink-2));
+    border-radius:var(--radius);padding:22px 22px 20px;color:var(--paper);
+    font-family:inherit;position:relative;overflow:hidden;
+    transition:transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s,box-shadow .25s;
+  }
+  .card:hover,.card:focus-visible{
+    transform:translateY(-3px);border-color:rgba(184,134,47,.45);
+    box-shadow:0 18px 40px -24px rgba(0,0,0,.8),0 0 0 1px rgba(184,134,47,.12) inset;outline:none;
+  }
+  .card .k{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  .card .q{font-family:"Fraunces",serif;font-size:clamp(20px,3.4vw,25px);font-weight:400;margin:12px 0 6px;color:var(--paper);line-height:1.12}
+  .card .d{font-size:13.5px;color:var(--mute);line-height:1.5}
+  .card .arrow{position:absolute;right:20px;bottom:18px;color:var(--gold);font-size:18px;opacity:.0;transform:translateX(-6px);transition:.25s}
+  .card:hover .arrow,.card:focus-visible .arrow{opacity:1;transform:none}
+  .card.demo{background:linear-gradient(135deg,rgba(184,134,47,.16),var(--ink-2));border-color:rgba(184,134,47,.4)}
+  .card.demo .q{color:var(--champagne)}
+
+  /* full-width feature card (What does Charis do?) */
+  .card.feature{width:100%;margin-top:14px;background-color:#1B160C;background-image:linear-gradient(120deg,rgba(184,134,47,.20),rgba(20,27,34,0) 65%);border-color:rgba(184,134,47,.42);padding:24px 24px 22px}
+  .card.feature .q{color:var(--champagne);font-size:clamp(22px,3.8vw,28px)}
+  .card.feature .d{color:var(--paper-dim);font-size:14px;max-width:48ch}
+  .featag{margin-top:12px;display:inline-block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:5px 13px}
+
+  /* term card */
+  .termcard{margin:16px 0 30px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--panel-2),var(--ink-2));padding:26px 24px;position:relative;overflow:hidden}
+  .termcard:before{content:"";position:absolute;inset:0;background:radial-gradient(420px 180px at 100% 0,rgba(184,134,47,.12),transparent 70%);pointer-events:none}
+  .termname{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(28px,5.2vw,44px);letter-spacing:-.01em;color:var(--champagne);line-height:1.05}
+  .termdef{font-size:16px;line-height:1.6;color:#E2DED4;max-width:58ch;margin-top:12px}
+  .termdef b{color:var(--champagne);font-weight:600}
+
+  .forkq{font-size:13px;letter-spacing:.04em;color:var(--mute);margin:0 0 13px}
+  .fork{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+  @media(max-width:600px){.fork{grid-template-columns:1fr}}
+  .forkbtn{position:relative;cursor:pointer;text-align:left;font-family:inherit;color:var(--paper);border:1px solid var(--line);border-radius:15px;background:var(--panel);padding:20px 20px 18px;transition:transform .2s,border-color .2s,background .2s}
+  .forkbtn:hover,.forkbtn:focus-visible{transform:translateY(-2px);border-color:rgba(184,134,47,.5);background:var(--panel-2);outline:none}
+  .forkbtn.watch{background:#221B0D;border-color:rgba(184,134,47,.5)}
+  .forkbtn .fk{font-family:"Fraunces",serif;font-size:21px;color:var(--champagne)}
+  .forkbtn .ft{font-size:13px;color:var(--mute);margin-top:6px;line-height:1.5;max-width:34ch}
+  .forkbtn .arrow{position:absolute;right:18px;top:20px;color:var(--gold);opacity:0;transform:translateX(-5px);transition:.2s}
+  .forkbtn:hover .arrow,.forkbtn:focus-visible .arrow{opacity:1;transform:none}
+
+  /* ---------- Persona ---------- */
+  .back{
+    background:none;border:none;color:var(--mute);font-family:inherit;font-size:13px;
+    cursor:pointer;padding:6px 0;margin-bottom:20px;display:inline-flex;align-items:center;gap:7px;
+    transition:color .2s;
+  }
+  .back:hover{color:var(--champagne)}
+  .persona-q{font-family:"Fraunces",serif;font-size:clamp(26px,4.6vw,40px);font-weight:400;margin:6px 0 8px;color:var(--paper)}
+  .persona-h{color:var(--mute);font-size:15px;margin:0 0 30px}
+  .personas{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;max-width:620px}
+  @media(max-width:560px){.personas{grid-template-columns:1fr}}
+  .pbtn{
+    cursor:pointer;text-align:left;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--paper);font-family:inherit;padding:18px 18px;
+    transition:transform .2s,border-color .2s,background .2s;
+  }
+  .pbtn:hover,.pbtn:focus-visible{transform:translateY(-2px);border-color:rgba(184,134,47,.5);background:var(--panel-2);outline:none}
+  .pbtn .pn{font-family:"Fraunces",serif;font-size:19px;color:var(--champagne)}
+  .pbtn .pd{font-size:12.5px;color:var(--mute);margin-top:3px}
+
+  /* ---------- Answer ---------- */
+  .ctx{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:18px}
+  .chip{font-size:11px;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--champagne);background:rgba(184,134,47,.06)}
+  .chip.q{color:var(--mute);border-color:var(--line-soft)}
+  .answer{
+    font-family:"Fraunces",serif;font-weight:400;
+    font-size:clamp(22px,3.8vw,32px);line-height:1.32;letter-spacing:-.005em;
+    color:#FAF6EE;max-width:24ch;min-height:1.3em;margin:6px 0 4px;
+  }
+  .answer .cursor{display:inline-block;width:2px;height:.95em;background:var(--gold);margin-left:2px;vertical-align:-2px;animation:blink 1s steps(2) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .answer-body{font-family:"Inter",sans-serif;font-size:16.5px;line-height:1.62;color:#E2DED4;max-width:60ch;margin:22px 0 0;opacity:0;transition:opacity .6s .2s}
+  .answer-body.show{opacity:1}
+
+  /* live persona re-render switch (the signature) */
+  .reswitch{margin:34px 0 0;border-top:1px solid var(--line-soft);padding-top:22px}
+  .reswitch .lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute-2);margin-bottom:12px}
+  .seg{display:inline-flex;flex-wrap:wrap;gap:8px}
+  .seg button{
+    font-family:inherit;font-size:13px;cursor:pointer;border:1px solid var(--line-soft);
+    background:transparent;color:var(--mute);border-radius:999px;padding:8px 15px;transition:.2s;
+  }
+  .seg button:hover{color:var(--paper)}
+  .seg button.on{background:var(--gold);border-color:var(--gold);color:#1A1206;font-weight:600}
+
+  /* ---------- Lenses (business owner · what does charis do) ---------- */
+  .lenses{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:26px 0 0}
+  @media(max-width:680px){.lenses{grid-template-columns:1fr}}
+  .lens{
+    border:1px solid var(--line);border-radius:14px;background:var(--panel);
+    padding:18px 18px;opacity:0;transform:translateY(10px);
+    animation:lensin .5s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  @keyframes lensin{to{opacity:1;transform:none}}
+  .lens .lk{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  .lens .lt{font-family:"Fraunces",serif;font-size:17px;color:var(--paper);margin:7px 0 6px;line-height:1.2}
+  .lens .lb{font-size:13px;color:var(--mute);line-height:1.5}
+
+  /* ---------- Business input ---------- */
+  .bizbox{margin:30px 0 0;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--panel-2),var(--ink-2));padding:24px}
+  .bizbox .bq{font-family:"Fraunces",serif;font-size:21px;color:var(--champagne);margin:0 0 4px}
+  .bizbox .bh{font-size:13.5px;color:var(--mute);margin:0 0 16px}
+  .inrow{display:flex;gap:10px;flex-wrap:wrap}
+  .inrow input{
+    flex:1;min-width:200px;font-family:inherit;font-size:15px;color:var(--paper);
+    background:var(--ink);border:1px solid var(--line);border-radius:11px;padding:13px 15px;
+  }
+  .inrow input::placeholder{color:var(--mute-2)}
+  .inrow input:focus{outline:none;border-color:var(--gold)}
+  .btn{
+    font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;border:none;
+    background:var(--gold);color:#1A1206;border-radius:11px;padding:13px 22px;transition:.2s;white-space:nowrap;
+  }
+  .btn:hover{background:var(--gold-bright)}
+  .btn.ghost{background:transparent;color:var(--champagne);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--gold);background:rgba(184,134,47,.07)}
+  .bizout{margin-top:18px;font-size:15.5px;line-height:1.6;color:var(--paper);border-left:2px solid var(--gold);padding-left:16px;display:none}
+  .bizout.show{display:block;animation:rise .4s both}
+  .bizout b{color:var(--champagne);font-weight:600}
+  .thinking{color:var(--mute);font-size:15px;display:inline-flex;align-items:center;gap:9px}
+  .thinking .td span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin:0 1px;animation:bb 1.1s infinite}
+  .thinking .td span:nth-child(2){animation-delay:.15s}
+  .thinking .td span:nth-child(3){animation-delay:.3s}
+  .regionStep{display:none;margin-top:18px}
+  .regionStep.show{display:block;animation:rise .35s both}
+  .bizex{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+  .exchip{font-family:inherit;font-size:12.5px;cursor:pointer;border:1px solid var(--line);background:rgba(184,134,47,.05);color:var(--paper-dim);border-radius:999px;padding:8px 13px;transition:.18s}
+  .exchip:hover,.exchip:focus-visible{border-color:var(--gold);color:var(--champagne);background:rgba(184,134,47,.1);outline:none}
+  .rlabel{font-size:13px;color:var(--paper-dim);margin-bottom:11px}
+  .regions{display:flex;gap:9px;flex-wrap:wrap}
+  .rbtn{font-family:inherit;font-size:13.5px;cursor:pointer;border:1px solid var(--line);background:var(--ink);color:var(--paper);border-radius:10px;padding:11px 17px;transition:.2s}
+  .rbtn:hover,.rbtn:focus-visible{border-color:var(--gold);background:rgba(184,134,47,.08);outline:none}
+  .rbtn.on{border-color:var(--gold);background:var(--gold);color:#1A1206;font-weight:600}
+
+  /* ---------- next actions ---------- */
+  .next{display:flex;gap:12px;flex-wrap:wrap;margin:36px 0 0}
+
+  /* ---------- Demo ---------- */
+  .demo-h{font-family:"Fraunces",serif;font-size:clamp(26px,4.6vw,40px);font-weight:400;margin:6px 0 6px}
+  .demo-s{color:var(--mute);font-size:15px;margin:0 0 26px;max-width:52ch}
+  .ind-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;max-width:680px}
+  @media(max-width:620px){.ind-grid{grid-template-columns:1fr 1fr}}
+  .ind{cursor:pointer;font-family:inherit;border:1px solid var(--line);background:var(--panel);color:var(--paper);border-radius:13px;padding:16px 14px;text-align:left;transition:.2s}
+  .ind:hover,.ind:focus-visible{border-color:rgba(184,134,47,.5);background:var(--panel-2);transform:translateY(-2px);outline:none}
+  .ind .in{font-family:"Fraunces",serif;font-size:16px;color:var(--champagne)}
+  .ind .id{font-size:12px;color:var(--mute);margin-top:2px}
+
+  .stage{margin:24px 0 0;border:1px solid var(--line);border-radius:18px;background:#0C1116;overflow:hidden;display:none}
+  .stage.show{display:block;animation:rise .45s both}
+  .stage .bar{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--line-soft);background:rgba(255,255,255,.015)}
+  .dot{width:9px;height:9px;border-radius:50%}
+  .dot.r{background:#E06B5E}.dot.y{background:#E0B24E}.dot.g{background:#6FB98A}
+  .bar .t{font-size:12px;color:var(--mute);margin-left:6px;letter-spacing:.02em}
+  .stage .body{padding:22px 20px;min-height:180px;font-size:14.5px}
+  .step{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;opacity:0;transform:translateY(8px);animation:lensin .45s forwards}
+  .step .ic{flex:none;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:13px;margin-top:1px}
+  .step.in .ic{background:rgba(138,144,153,.16);color:var(--mute)}
+  .step.work .ic{background:rgba(184,134,47,.18);color:var(--gold)}
+  .step.done .ic{background:rgba(127,185,154,.16);color:var(--ok)}
+  .step .sx{flex:1}
+  .step .sl{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute-2);margin-bottom:3px}
+  .step .st{color:var(--paper);line-height:1.5}
+  .step .st b{color:var(--champagne);font-weight:600}
+  .result{margin-top:6px;border:1px solid var(--line);border-radius:12px;background:rgba(184,134,47,.05);padding:15px 16px;color:var(--paper);line-height:1.55}
+  .demo-more{margin:22px 4px 2px;padding-top:18px;border-top:1px solid var(--line-soft);font-family:"Fraunces",serif;font-size:16px;font-style:italic;line-height:1.5;color:var(--paper-dim);opacity:0;animation:rise .5s .1s forwards}
+  .demo-more b{font-style:normal;color:var(--champagne);font-weight:600}
+  .typing-dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin:0 2px;animation:bb 1.1s infinite}
+  .typing-dots span:nth-child(2){animation-delay:.15s}.typing-dots span:nth-child(3){animation-delay:.3s}
+  @keyframes bb{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+  /* ---------- Footer / contact ---------- */
+  footer{margin-top:70px;border-top:1px solid var(--line-soft);padding-top:26px;display:flex;justify-content:center;text-align:center}
+  .contact{font-size:13px;color:var(--mute);text-align:center;line-height:1.7}
+  .contact a{color:var(--champagne);text-decoration:none}
+  .contact a:hover{color:var(--gold-bright)}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+    .answer .cursor{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="bg" aria-hidden="true"></div>
+<div class="wrap">
+
+  <div class="brandbar">
+    <svg class="medallion" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+      <circle cx="50" cy="50" r="47" stroke="#B8862F" stroke-width="1.2" opacity=".55"/>
+      <circle cx="50" cy="50" r="40" stroke="#B8862F" stroke-width="2.5"/>
+      <g stroke="#B8862F" stroke-width="1" opacity=".5">
+        <line x1="50" y1="22" x2="50" y2="34"/><line x1="50" y1="66" x2="50" y2="78"/>
+        <line x1="28" y1="50" x2="36" y2="50"/><line x1="64" y1="50" x2="72" y2="50"/>
+        <circle cx="50" cy="22" r="2" fill="#B8862F"/><circle cx="50" cy="78" r="2" fill="#B8862F"/>
+        <circle cx="28" cy="50" r="2" fill="#B8862F"/><circle cx="72" cy="50" r="2" fill="#B8862F"/>
+      </g>
+      <text x="50" y="50" text-anchor="middle" dominant-baseline="central" font-family="Fraunces, serif" font-size="44" font-weight="500" fill="#E7D2A4">C</text>
+    </svg>
+    <div class="brandname">Charis<small>Applied Intelligence</small></div>
+  </div>
+
+  <!-- ============ SCREEN 0 : ENTRY ============ -->
+  <section id="s0" class="screen active">
+    <div class="eyebrow">Start anywhere</div>
+    <h1 class="hero">What do you want to <em>understand?</em></h1>
+    <p class="sub">Pick a question. We'll explain it the right way for you — whether you're fourteen or running a company.</p>
+    <div class="cards">
+      <button class="card" onclick="askPersona('what')">
+        <div class="k">The basics</div>
+        <div class="q">What is AI?</div>
+        <div class="d">No jargon. The real idea, in plain words.</div>
+        <div class="arrow">→</div>
+      </button>
+      <button class="card" onclick="askPersona('matter')">
+        <div class="k">For you</div>
+        <div class="q">How does AI matter to me?</div>
+        <div class="d">Where it actually touches your day.</div>
+        <div class="arrow">→</div>
+      </button>
+    </div>
+    <button class="card feature" onclick="go('sC')">
+      <div class="k">The point of all this</div>
+      <div class="q">What does Charis do?</div>
+      <div class="d">Applied Intelligence — explained, then proven. Read it, or watch it work.</div>
+      <div class="featag">Read it · Watch it</div>
+      <div class="arrow">→</div>
+    </button>
+  </section>
+
+  <!-- ============ SCREEN C : CHARIS FORK ============ -->
+  <section id="sC" class="screen">
+    <button class="back" onclick="go('s0')">← back</button>
+    <div class="eyebrow">The category we built</div>
+    <div class="termcard">
+      <div class="termname">Applied&nbsp;Intelligence</div>
+      <div class="termdef">AI is the engine. <b>Applied Intelligence</b> is that engine pointed at your problem — built around where you actually win or lose, not a tool you bend your business to fit. That's what Charis builds, and only that.</div>
+    </div>
+    <div class="forkq">See how Applied Intelligence helps — your way:</div>
+    <div class="fork">
+      <button class="forkbtn" onclick="askPersona('charis')">
+        <div class="fk">Read it</div>
+        <div class="ft">In plain words, tuned to who you are — then tell me your business and I'll show you exactly where it helps.</div>
+        <div class="arrow">→</div>
+      </button>
+      <button class="forkbtn watch" onclick="showDemo()">
+        <div class="fk">Watch it</div>
+        <div class="ft">Skip the reading. Watch Applied Intelligence win one real moment, start to finish.</div>
+        <div class="arrow">→</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 1 : PERSONA ============ -->
+  <section id="s1" class="screen">
+    <button class="back" onclick="go('s0')">← back</button>
+    <div class="persona-q">First — who's asking?</div>
+    <p class="persona-h">So the answer lands the way it should. Nothing saved, nothing shared.</p>
+    <div class="personas">
+      <button class="pbtn" onclick="answer('owner')"><div class="pn">Business owner</div><div class="pd">Small, mid-size, or scaling</div></button>
+      <button class="pbtn" onclick="answer('pro')"><div class="pn">Professional / enthusiast</div><div class="pd">Curious, working, keeping up</div></button>
+      <button class="pbtn" onclick="answer('student')"><div class="pn">Student</div><div class="pd">Learning the ropes</div></button>
+      <button class="pbtn" onclick="answer('parent')"><div class="pn">Parent</div><div class="pd">Just want to get it</div></button>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 2 : ANSWER ============ -->
+  <section id="s2" class="screen">
+    <button class="back" onclick="go('s0')">← start over</button>
+    <div class="ctx">
+      <span class="chip q" id="ctxQ">What is AI?</span>
+      <span class="chip" id="ctxP">Business owner</span>
+    </div>
+    <div class="answer" id="ansLine"><span class="cursor"></span></div>
+    <div class="answer-body" id="ansBody"></div>
+
+    <!-- lenses mount here for owner+charis -->
+    <div id="lensMount"></div>
+    <!-- business input mounts here -->
+    <div id="bizMount"></div>
+
+    <div class="reswitch">
+      <div class="lbl">See it adapt — same question, different person</div>
+      <div class="seg" id="segP">
+        <button data-p="owner" onclick="reswitch('owner')">Business owner</button>
+        <button data-p="pro" onclick="reswitch('pro')">Professional</button>
+        <button data-p="student" onclick="reswitch('student')">Student</button>
+        <button data-p="parent" onclick="reswitch('parent')">Parent</button>
+      </div>
+    </div>
+
+    <div class="next">
+      <button class="btn" onclick="showDemo()">See it work →</button>
+      <button class="btn ghost" onclick="go('s0')">Ask something else</button>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 3 : DEMO ============ -->
+  <section id="s3" class="screen">
+    <button class="back" onclick="go('s0')">← back</button>
+    <div class="eyebrow">Live walkthrough</div>
+    <div class="demo-h">Pick your world. Watch Applied Intelligence go to work.</div>
+    <p class="demo-s">A scripted preview of Applied Intelligence turning one real moment into a win — start to finish. No slides, no buzzwords.</p>
+    <div class="ind-grid" id="indGrid"></div>
+    <div class="stage" id="stage">
+      <div class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="t" id="stageT">charis · working</span></div>
+      <div class="body" id="stageBody"></div>
+    </div>
+    <div class="next">
+      <button class="btn" onclick="go('sC')">Explain it instead →</button>
+    </div>
+  </section>
+
+  <footer>
+    <div class="contact">
+      Charis Applied Intelligence<br>
+      <a href="mailto:office@charisappliedintelligence.com">office@charisappliedintelligence.com</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+/* ---------------- state ---------------- */
+let CURRENT_Q = 'what';
+const Q_LABEL = {what:'What is AI?', matter:'How does AI matter to me?', charis:'What does Charis do?'};
+const P_LABEL = {owner:'Business owner', pro:'Professional', student:'Student', parent:'Parent'};
+
+/* ---------------- copy matrix ---------------- */
+/* each = {line: short Fraunces hook, body: plain-language follow} */
+const COPY = {
+  what:{
+    owner:{line:"Leverage on your judgment — not just your task list.",
+      body:"Most people think AI just does work faster. The real power is that it sees what you can't — which customer's about to leave, which deal is real, where you're leaving money on the table — and acts while it still matters. It doesn't shrink your team. It makes the one you have sharper, bigger, and harder to beat."},
+    pro:{line:"Software that learns from examples instead of being told every rule.",
+      body:"Show a model enough data and it infers the pattern, then applies it anywhere. The shift that matters isn't the tech — it's that this capability is now a service you can point at any workflow, instead of a moonshot only Google could afford."},
+    student:{line:"A computer that learns from examples — not from being told every rule.",
+      body:"Show it ten thousand photos of cats and it figures out \u201Ccat\u201D on its own, then spots one it's never seen. That's it. Not magic — pattern-spotting at a scale no human can match."},
+    parent:{line:"It learns the way your kid learned what a dog is.",
+      body:"Not from a definition — from seeing thousands of examples. Once AI has learned a pattern, it can do that one thing tirelessly: sort, answer, draft, predict. Same idea your child uses, just millions of examples at a time."}
+  },
+  matter:{
+    owner:{line:"It's where your next growth comes from — not your next cost cut.",
+      body:"Used small, AI trims busywork. Used right, it changes what your business is capable of: it finds revenue you can't see, lets one person reach thousands like it's one-to-one, and gets you to the deal before anyone else. The question stops being \u201Cwhat can I automate?\u201D and becomes \u201Cwhat could I do that I can't do today?\u201D"},
+    pro:{line:"It's becoming the baseline skill — and the floor is rising.",
+      body:"The professionals who compound their output with it pull away from the ones who don't, the same way spreadsheets separated finance teams in the '80s. It matters because \u201Cgood enough\u201D just moved, whether or not you moved with it."},
+    student:{line:"The most patient tutor you'll ever have — at 2am, for free.",
+      body:"It'll explain the same thing five different ways until it clicks. Used well, it makes you faster at learning anything. Used lazily, it learns for you instead of with you. That difference is everything."},
+    parent:{line:"It takes the mental load off your plate.",
+      body:"It plans the week, answers the thing you'd have spent twenty minutes chasing, drafts the note you've been dreading. Not a gadget — just a little more room in your head, and a little more patience for the people who actually need you."}
+  },
+  charis:{
+    owner:{line:"We don't sell you AI. We turn it into your edge.",
+      body:"Anyone can hand you a chatbot. Applied Intelligence finds where your business actually wins or loses — the deal, the customer, the moment — and builds intelligence around that. Not faster busywork. A real advantage, in whatever form your business needs it:"},
+    pro:{line:"Applied intelligence — we install outcomes, not models.",
+      body:"We don't sell you a chatbot and wish you luck. We find the friction in how an organization really works and remove it with AI built around that specific workflow, not a generic tool you have to bend your business to fit."},
+    student:{line:"We turn big-company AI into tools regular people can actually use.",
+      body:"The smart stuff — answering questions, finding what you need, doing the boring parts — built so it solves one real problem at a time, for real people and real businesses."},
+    parent:{line:"We take the complicated-sounding stuff and make it simple and useful.",
+      body:"Less hype, more \u201Coh — that just saved me an afternoon.\u201D Charis builds AI that solves one real problem at a time, in plain language, for people who don't have time to learn the jargon."}
+  }
+};
+
+/* lenses: owner + charis only */
+const LENSES = [
+  {k:"Sharper calls", t:"Know the move before you'd have noticed.", b:"Charis reads the patterns in your own data — the customer about to churn, the deal that's real, the price that wins — and tells you while there's still time to act."},
+  {k:"Hidden revenue", t:"Find the money already in the room.", b:"The upsell you're missing, the offer you're under-pricing, the customer ready to buy again. Most businesses sit on revenue they can't see. Charis surfaces it."},
+  {k:"Reach, multiplied", t:"Be everywhere, and still personal.", b:"Brand, creator, founder or athlete — your voice and presence carried to thousands at once, each one feeling one-to-one. Your gift scaled, not your inbox emptied."},
+  {k:"Your A-game, always", t:"Every customer gets your best version.", b:"Not the tired-Friday one. On-voice, top-shelf, every time, any hour. That consistency becomes reputation — and reputation compounds."},
+  {k:"First to win", t:"Show up first, with the right answer.", b:"Deals go to whoever's there first and sharpest. Charis makes that you — not by saving you minutes, but by winning you the moment."}
+];
+
+/* business keyword matcher */
+const BIZ_RULES = [
+  {kw:["ecommerce","e-commerce","e commerce","shopify","online store","online shop","dtc","d2c","webstore","sell online","amazon seller"], out:"For an <b>e-commerce</b> brand, Applied Intelligence starts by knowing your shopper — the right recommendation, the right nudge, the bigger basket — so you grow revenue without discounting your way there. It recovers the carts that stall, answers sizing and shipping instantly in your voice, and flags which products to push and which to retire before the numbers are obvious."},
+  {kw:["coworking","co-working","co working","shared office","office space","workspace","desk rental","logic","flexible office","serviced office"], out:"For a <b>shared-office / coworking</b> business, Applied Intelligence starts where occupancy and revenue live — filling desks and rooms by knowing which tour leads actually convert, which members are about to leave, and what to upsell (meeting rooms, dedicated desks, events). It answers enquiries and books tours in seconds, and tells you the pricing and packages that keep the space full."},
+  {kw:["restaurant","food","cafe","diner","bar","kitchen","catering","eatery","bistro","cloud kitchen"], out:"For a <b>restaurant or food</b> business, Applied Intelligence starts with your regulars and your reputation — knowing who to bring back, when, and with what, and answering every review in your voice. It sees your slow shifts before they happen and fills them, and turns one-time diners into repeat revenue."},
+  {kw:["airbnb","vacation rental","staycation","short-term rental","short term rental","str","vrbo","vacation home","rental property","holiday let","homestay","host"], out:"For <b>vacation rentals / staycations</b>, Applied Intelligence starts with the two things that make or break a listing — pricing and reviews. It prices each night to the demand it sees, replies to every guest instantly so you win the booking, and protects your rating with on-time, on-voice messages. More booked nights, at the right rate, with five-star consistency."},
+  {kw:["construction","builder","architect","contractor","developer","engineering","real estate","realty","homes","property","build","renovation","civil"], out:"For <b>construction, building or architecture</b>, Applied Intelligence starts where projects are won — responding to enquiries first, qualifying which leads are real, and pricing bids to win without giving away margin. It keeps clients updated in your voice through the build, and surfaces the upsells and referrals hiding in your past projects."},
+  {kw:["clothing","apparel","fashion","boutique","clothes","garment","wear","outfit","tailor","label"], out:"For a <b>clothing business</b> — floor and feed both — Applied Intelligence starts by connecting your store and your socials: knowing what's selling, what to restock, and what to put in front of each customer online and in person. It carries your brand voice across every post and DM, recovers the browsers who didn't buy, and spots the trend to lean into before competitors catch it."},
+  {kw:["influencer","creator","content creator","youtuber","blogger","streamer","social media personality"], out:"For an <b>influencer</b>, Applied Intelligence starts by carrying your voice to thousands without diluting it — replying so every fan feels seen, surfacing the brand deals worth real money out of the noise, and catching the reply that could've become a problem before it posts. Your reach grows, your brand stays yours."},
+  {kw:["celebrity","aspiring","actor","actress","artist","musician","singer","performer","model","aspirant","fame","star","talent","dancer"], out:"For a <b>celebrity aspirant</b>, Applied Intelligence starts by building the presence before the platform does — one consistent voice across every channel, content that compounds your story, and engagement that turns followers into a real fanbase. It spots the moments worth amplifying and the opportunities worth your time, so momentum builds on purpose, not by luck."}
+];
+
+const BIZ_DEFAULT="Tell Charis your world and it does the same thing every time — finds where you actually win or lose (the customer, the deal, the moment) and builds intelligence around exactly that. Not faster busywork. A real edge. Want to see it on a live example? Tap <b>See it work</b>.";
+
+const REGION_MOD={
+  "India":" In <b>India</b>, that runs WhatsApp-first and in the languages your customers actually speak — meeting them exactly where they are.",
+  "United States":" Across the <b>US</b>, that's every channel at once — text, email, web, social — always on-brand, always on time.",
+  "Canada":" In <b>Canada</b>, that's bilingual-ready and privacy-first by default, built for how you're expected to operate.",
+  "Global":" <b>Globally</b>, Charis works every timezone and language at once — so reach stops depending on your hours."
+};
+
+/* ---------------- screen control ---------------- */
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function askPersona(q){ CURRENT_Q=q; go('s1'); }
+
+/* ---------------- answer rendering ---------------- */
+let typeTimer=null;
+function answer(p){
+  go('s2');
+  render(CURRENT_Q,p);
+}
+
+function reswitch(p){ render(CURRENT_Q,p,true); }
+
+function render(q,p,fromSwitch){
+  CURRENT_Q=q;
+  const data=COPY[q][p];
+  document.getElementById('ctxQ').textContent=Q_LABEL[q];
+  document.getElementById('ctxP').textContent=P_LABEL[p];
+  // segmented control state
+  document.querySelectorAll('#segP button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+
+  // reset mounts
+  document.getElementById('lensMount').innerHTML='';
+  document.getElementById('bizMount').innerHTML='';
+  const bodyEl=document.getElementById('ansBody');
+  bodyEl.classList.remove('show'); bodyEl.textContent='';
+
+  // typewriter the line
+  const lineEl=document.getElementById('ansLine');
+  if(typeTimer){clearInterval(typeTimer);}
+  const txt=data.line;
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){
+    lineEl.innerHTML=txt; finishAnswer(q,p,data,bodyEl);
+    return;
+  }
+  lineEl.innerHTML='<span class="cursor"></span>';
+  let i=0;
+  typeTimer=setInterval(()=>{
+    i++;
+    lineEl.innerHTML=txt.slice(0,i)+'<span class="cursor"></span>';
+    if(i>=txt.length){
+      clearInterval(typeTimer);
+      lineEl.innerHTML=txt;
+      finishAnswer(q,p,data,bodyEl);
+    }
+  }, 18);
+}
+
+function finishAnswer(q,p,data,bodyEl){
+  bodyEl.textContent=data.body;
+  requestAnimationFrame(()=>bodyEl.classList.add('show'));
+  if(q==='charis'){
+    if(p==='owner'){ mountLenses(); mountBiz(); }
+    else if(p==='student'){ mountFlow(STUDENT_FLOW); }
+    else if(p==='parent'){ mountFlow(PARENT_FLOW); }
+    else if(p==='pro'){ mountFlow(PRO_FLOW); }
+  }
+}
+
+function mountLenses(){
+  const m=document.getElementById('lensMount');
+  const g=document.createElement('div'); g.className='lenses';
+  LENSES.forEach((l,idx)=>{
+    const d=document.createElement('div'); d.className='lens';
+    d.style.animationDelay=(0.15+idx*0.08)+'s';
+    d.innerHTML=`<div class="lk">${l.k}</div><div class="lt">${l.t}</div><div class="lb">${l.b}</div>`;
+    g.appendChild(d);
+  });
+  m.appendChild(g);
+}
+
+function mountBiz(){
+  const m=document.getElementById('bizMount');
+  const box=document.createElement('div'); box.className='bizbox';
+  box.innerHTML=`
+    <div class="bq">Enter your world.</div>
+    <div class="bh">Type your business or industry — anything at all — and Applied Intelligence will show you where it helps.</div>
+    <div class="inrow">
+      <input id="bizIn" type="text" placeholder="e.g. a dental clinic, a logistics startup, my bakery…" autocomplete="off">
+      <button class="btn" onclick="bizNext()">Continue</button>
+    </div>
+    <div class="regionStep" id="regionStep">
+      <div class="rlabel">Where do you operate?</div>
+      <div class="regions">
+        <button class="rbtn" onclick="runBiz('India')">India</button>
+        <button class="rbtn" onclick="runBiz('United States')">United States</button>
+        <button class="rbtn" onclick="runBiz('Canada')">Canada</button>
+        <button class="rbtn" onclick="runBiz('Global')">Global</button>
+      </div>
+    </div>
+    <div class="bizout" id="bizOut"></div>`;
+  m.appendChild(box);
+  const inp=document.getElementById('bizIn');
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')bizNext();});
+}
+
+/* Live-answer endpoint (Netlify serverless function — see netlify/functions/charis.mjs) */
+const CHARIS_API="/.netlify/functions/charis";
+
+let BIZ_TEXT='';      // lowercased, for keyword matching
+let BIZ_TEXT_RAW='';  // original, sent to the model
+function bizNext(){
+  const v=(document.getElementById('bizIn').value||'').trim();
+  if(!v){document.getElementById('bizIn').focus();return;}
+  BIZ_TEXT=v.toLowerCase();
+  BIZ_TEXT_RAW=v;
+  const rs=document.getElementById('regionStep');
+  rs.classList.add('show');
+  rs.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+async function runBiz(region){
+  document.querySelectorAll('#regionStep .rbtn').forEach(b=>b.classList.toggle('on', b.textContent===region));
+  const out=document.getElementById('bizOut');
+  out.classList.add('show');
+
+  // 1) instant — common industries answer with zero latency, fully on-brand
+  let match=null;
+  for(const r of BIZ_RULES){ if(r.kw.some(k=>BIZ_TEXT.includes(k))){match=r.out;break;} }
+  if(match){
+    out.innerHTML=match+(REGION_MOD[region]||'');
+    out.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+
+  // 2) live — anything else is generated in real time by Applied Intelligence
+  out.innerHTML=`<span class="thinking">Reading your world<span class="td"><span></span><span></span><span></span></span></span>`;
+  out.scrollIntoView({behavior:'smooth',block:'nearest'});
+  try{
+    const res=await fetch(CHARIS_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({business:BIZ_TEXT_RAW, region})
+    });
+    if(!res.ok) throw new Error('status '+res.status);
+    const data=await res.json();
+    const answer=(data && typeof data.answer==='string') ? data.answer.trim() : '';
+    if(!answer) throw new Error('empty');
+    out.innerHTML=answer;
+  }catch(err){
+    // never dead-end — fall back to the strong generic answer
+    out.innerHTML=BIZ_DEFAULT+(REGION_MOD[region]||'');
+  }
+  out.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ---------------- persona workflows (student / parent / professional) ---------------- */
+let FLOW_CFG=null;
+function mountFlow(cfg){
+  FLOW_CFG=cfg;
+  const m=document.getElementById('bizMount');
+  const box=document.createElement('div'); box.className='bizbox';
+  box.innerHTML=`
+    <div class="bq">${cfg.q}</div>
+    <div class="bh">${cfg.sub}</div>
+    <div class="inrow">
+      <input id="flowIn" type="text" placeholder="${cfg.ph}" autocomplete="off">
+      <button class="btn" onclick="runFlow()">Show me</button>
+    </div>
+    <div class="bizex" id="flowEx"></div>
+    <div class="bizout" id="flowOut"></div>`;
+  m.appendChild(box);
+  const ex=document.getElementById('flowEx');
+  cfg.examples.forEach(e=>{
+    const c=document.createElement('button'); c.className='exchip'; c.textContent=e;
+    c.onclick=()=>{const i=document.getElementById('flowIn'); i.value=e; runFlow();};
+    ex.appendChild(c);
+  });
+  document.getElementById('flowIn').addEventListener('keydown',e=>{if(e.key==='Enter')runFlow();});
+}
+function runFlow(){
+  if(!FLOW_CFG) return;
+  const v=(document.getElementById('flowIn').value||'').toLowerCase().trim();
+  const out=document.getElementById('flowOut');
+  if(!v){document.getElementById('flowIn').focus();return;}
+  let match=null;
+  for(const r of FLOW_CFG.rules){ if(r.kw.some(k=>v.includes(k))){match=r.out;break;} }
+  out.innerHTML=match||FLOW_CFG.def;
+  out.classList.add('show');
+  out.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+const STUDENT_FLOW={
+  q:"What are you stuck on?",
+  sub:"Tell me, or tap one — I'll show you how Applied Intelligence becomes your tutor for it.",
+  ph:"e.g. algebra, essays, Spanish, coding…",
+  examples:["Math","Essays & writing","A language","Coding","Studying for a test","Science"],
+  rules:[
+    {kw:["math","algebra","calculus","geometry","trig"], out:"For <b>math</b>, it's the tutor that never sighs. It works the problem with you step by step, explains the step you missed five different ways, and gives you ten more like it until it clicks — the understanding earned, not the answer copied."},
+    {kw:["essay","writing","write","english","paper"], out:"For <b>writing</b>, it's the editor in your corner. It doesn't write it for you — it asks the questions that sharpen your argument, catches the weak paragraph, and shows you <i>why</i> a sentence isn't landing. You get better, not just done."},
+    {kw:["language","spanish","french","german","mandarin","japanese"], out:"For <b>learning a language</b>, it's a patient partner who'll chat with you at your level, correct you kindly, and explain the grammar rule the textbook made confusing — anytime, with zero embarrassment."},
+    {kw:["coding","code","program","python","javascript","java"], out:"For <b>coding</b>, it's the senior dev who'll never make you feel dumb. It explains the error, shows you why your loop breaks, and walks you through the fix — so next time you catch it yourself."},
+    {kw:["test","exam","study","studying","quiz","finals"], out:"For <b>studying</b>, it turns your notes into practice questions, drills you on the weak spots, and explains anything you miss — so you walk in prepared, not just hopeful."},
+    {kw:["science","biology","chemistry","physics"], out:"For <b>science</b>, it breaks the hard concept into plain language, draws the analogy that makes it stick, and checks your understanding — the patient explainer you wish every class had."}
+  ],
+  def:"Whatever you're learning, it's the tutor with infinite patience — explaining it your way, as many times as it takes, until it actually clicks. Used well, it makes you faster at learning anything."
+};
+
+const PARENT_FLOW={
+  q:"What's eating your week?",
+  sub:"Tell me, or tap one — I'll show you where Applied Intelligence quietly takes the load off.",
+  ph:"e.g. the kids' schedules, school emails, dinner…",
+  examples:["Kids' schedules","School emails","Meal planning","Bills & admin","Travel & plans","The endless to-do list"],
+  rules:[
+    {kw:["schedule","calendar","practice","activities","pickup","carpool"], out:"For <b>juggling everyone's schedules</b>, it keeps the whole family's week straight — practices, appointments, who's where — and flags the clash before it becomes a crisis. The load of <i>remembering</i>, lifted."},
+    {kw:["school","email","form","teacher","homework"], out:"For <b>the school emails and forms</b>, it reads the long ones, pulls out what actually needs you — the permission slip, the date — and drafts your reply. The pile stops running your evenings."},
+    {kw:["meal","dinner","food","grocery","cook","recipe"], out:"For <b>the nightly 'what's for dinner'</b>, it plans the week around what your family actually eats, builds the grocery list, and swaps the recipe when you're out of an ingredient. One less decision, every day."},
+    {kw:["bill","admin","paperwork","appointment","renewal","insurance"], out:"For <b>the admin pile</b> — bills, renewals, appointments — it tracks what's due, reminds you before it's late, and drafts the annoying email you've been avoiding."},
+    {kw:["travel","trip","plan","vacation","weekend"], out:"For <b>planning trips and weekends</b>, it does the research you don't have time for — options that fit your budget and your kids' ages — and lays out a plan you can just say yes to."},
+    {kw:["todo","to-do","list","everything","overwhelm"], out:"For <b>the endless to-do list</b>, it's the second brain that remembers what you forgot, drafts what you've put off, and hands back an hour for the people who actually need you."}
+  ],
+  def:"Whatever's filling your week, it quietly takes the load off — planning, drafting, remembering, researching — so there's a little more room in your head, and a little more patience for the people who matter."
+};
+
+const PRO_FLOW={
+  q:"What do you do all day?",
+  sub:"Tell me, or tap one — I'll show you where Applied Intelligence compounds your output.",
+  ph:"e.g. emails, reports, research, spreadsheets…",
+  examples:["Emails & meetings","Reports & docs","Research","Spreadsheets & data","Client work","Presentations"],
+  rules:[
+    {kw:["email","meeting","inbox","calls","follow up","follow-up"], out:"For <b>the inbox and meetings</b>, it drafts replies in your voice, turns the hour-long call into the three decisions that mattered, and tells you what to follow up on. You stay on top of it instead of buried under it."},
+    {kw:["report","doc","document","writing","memo"], out:"For <b>reports and docs</b>, it gives you a strong first draft from your notes, tightens the argument, and formats the thing — so your time goes to the thinking, not the typing."},
+    {kw:["research","reading","sources","literature"], out:"For <b>research</b>, it reads the twenty sources you don't have time for and hands you the synthesis — key findings, disagreements, what it means for your decision. Hours of reading, in minutes."},
+    {kw:["spreadsheet","data","excel","analysis","numbers","model"], out:"For <b>spreadsheets and data</b>, it writes the formula you're googling, finds the pattern in the numbers, and explains what's driving them — analyst-level work without the analyst wait."},
+    {kw:["client","customer","account","sales"], out:"For <b>client work</b>, it preps you before the call with everything you need to know, drafts the follow-up, and never lets a detail slip — so every client feels like your only client."},
+    {kw:["presentation","deck","slides","pitch"], out:"For <b>presentations</b>, it turns rough thinking into a clean narrative, suggests the one chart that makes the point, and tightens every slide — so you walk in with the story, not just bullets."}
+  ],
+  def:"Whatever your day is made of, it compounds your output — drafting, summarizing, researching, analyzing. The professionals who use it well pull ahead of the ones who don't; the floor just rose, and this is how you stay above it."
+};
+
+/* ---------------- demo ---------------- */
+const INDUSTRIES=[
+  {id:"ecom",   n:"E-commerce", d:"A buyer on the edge", t:"applied intelligence · store"},
+  {id:"cowork", n:"Coworking space", d:"A regular who should be a member", t:"applied intelligence · front desk"},
+  {id:"food",   n:"Restaurant", d:"A slow night, a fresh review", t:"applied intelligence · floor"},
+  {id:"stay",   n:"Vacation rentals", d:"A booking, at the right price", t:"applied intelligence · host desk"},
+  {id:"build",  n:"Construction / real estate", d:"A bid worth winning", t:"applied intelligence · projects"},
+  {id:"cloth",  n:"Clothing", d:"Floor and feed, one view", t:"applied intelligence · studio"},
+  {id:"infl",   n:"Influencer", d:"Opportunity buried in noise", t:"applied intelligence · inbox"},
+  {id:"celeb",  n:"Celebrity aspirant", d:"Build the presence first", t:"applied intelligence · momentum"}
+];
+
+const DEMO_SCRIPT={
+  ecom:[
+    {type:"in",  l:"Incoming",  t:"A shopper lingers on a $180 bundle, then hesitates."},
+    {type:"work",l:"Charis",    t:"Recognizes them — a repeat buyer — and knows what they bought last time. Recommends the one add-on that actually fits, not a blanket discount."},
+    {type:"work",l:"Charis",    t:"Answers their sizing question instantly, in your brand's voice."},
+    {type:"done",l:"Result",    t:"They check out with a bigger basket — because the recommendation was right, not because you cut the price.", result:"<b>Bigger order, full margin.</b> Applied Intelligence that knows your customer beats a bot that just answers the question."}
+  ],
+  cowork:[
+    {type:"in",  l:"Incoming",  t:"A freelancer walks in for a day pass — same as most days this month."},
+    {type:"work",l:"Charis",    t:"It caught what the front desk didn't: that's their 9th day pass in three weeks. They've already spent more than a monthly desk would cost."},
+    {type:"work",l:"Charis",    t:"Greets them by name with the offer that fits — \u201Ca dedicated desk would cost you less than this, and your usual corner is free\u201D — ready to sign in one tap."},
+    {type:"done",l:"Result",    t:"A drop-in regular becomes a member on a monthly plan — paying less per visit, and locked in for the year.", result:"<b>Nine uncertain day passes became one recurring membership.</b> The signal was in how often they came — not in any enquiry you'd have seen."}
+  ],
+  food:[
+    {type:"in",  l:"Incoming",  t:"It's a quiet Tuesday, and a 3-star review just landed."},
+    {type:"work",l:"Charis",    t:"Replies to the review in your voice — gracious, on-brand — before it shapes anyone's first impression."},
+    {type:"work",l:"Charis",    t:"Sees the slow night coming and messages your regulars a reason to come in tonight."},
+    {type:"done",l:"Result",    t:"The review's handled and the room fills — without a discount blast.", result:"<b>Reputation protected, a slow shift saved.</b> Regulars brought back on purpose, not by luck."}
+  ],
+  stay:[
+    {type:"in",  l:"Incoming",  t:"A guest enquires about your beach rental for a long weekend — peak demand."},
+    {type:"work",l:"Charis",    t:"Replies instantly to win the booking, and prices those nights to the demand it sees, not last year's rate."},
+    {type:"work",l:"Charis",    t:"Schedules the check-in messages and review request that keep your rating at five stars."},
+    {type:"done",l:"Result",    t:"Booked at the right price, with a five-star review already in motion.", result:"<b>More booked nights, higher rate, protected rating.</b> The three things that make or break a listing — handled."}
+  ],
+  build:[
+    {type:"in",  l:"Incoming",  t:"A project enquiry lands: a custom home, ready to start in spring."},
+    {type:"work",l:"Charis",    t:"Responds first, asks the right qualifying questions, and reads the lead — real budget, real timeline. Worth your time."},
+    {type:"work",l:"Charis",    t:"Prices the bid against your true costs and the local market — competitive, without giving away margin."},
+    {type:"done",l:"Result",    t:"You win the bid the slower firms are still scoping — at a price that protects your profit.", result:"<b>Won the project, kept the margin.</b> Applied Intelligence knew which lead was real and what to charge."}
+  ],
+  cloth:[
+    {type:"in",  l:"Incoming",  t:"A new drop goes live — floor and online at once."},
+    {type:"work",l:"Charis",    t:"Sees what's moving in real time, flags the size about to sell out, and tells you what to restock now."},
+    {type:"work",l:"Charis",    t:"Puts the right piece in front of each shopper online, recovers a browser who left, and posts in your brand voice."},
+    {type:"done",l:"Result",    t:"The drop sells through faster, and the browsers who hesitated come back.", result:"<b>Sell-through up, fewer markdowns.</b> Your floor and your feed finally working as one."}
+  ],
+  infl:[
+    {type:"in",  l:"Incoming",  t:"A post pops off: 500 DMs — fans, noise, and somewhere in there, real opportunity."},
+    {type:"work",l:"Charis",    t:"Replies to fans in your actual voice, so the relationship grows instead of just getting cleared."},
+    {type:"work",l:"Charis",    t:"Surfaces the one that matters — a brand asking about a paid deal — and catches a reply that could've become a PR problem."},
+    {type:"done",l:"Result",    t:"Your reach grew, your voice stayed yours, and you caught the deal you'd have scrolled right past.", result:"<b>An $8k partnership found in the noise</b> — and a brand-risk reply caught before it posted. Reach that protects you."}
+  ],
+  celeb:[
+    {type:"in",  l:"Incoming",  t:"You're talented, but unknown — and the algorithm doesn't know you exist yet."},
+    {type:"work",l:"Charis",    t:"Keeps one consistent voice across every platform, posting the content that compounds your story."},
+    {type:"work",l:"Charis",    t:"Spots last week's moment worth amplifying, and the one collab DM actually worth your time."},
+    {type:"done",l:"Result",    t:"Followers start to feel like a fanbase — because the presence was built on purpose.", result:"<b>Momentum that builds, not flickers.</b> The presence comes before the platform even notices you."}
+  ]
+};
+
+function buildIndGrid(){
+  const g=document.getElementById('indGrid'); g.innerHTML='';
+  INDUSTRIES.forEach(ind=>{
+    const b=document.createElement('button'); b.className='ind';
+    b.onclick=()=>runDemo(ind);
+    b.innerHTML=`<div class="in">${ind.n}</div><div class="id">${ind.d}</div>`;
+    g.appendChild(b);
+  });
+}
+
+let demoTimers=[];
+function clearDemo(){ demoTimers.forEach(t=>clearTimeout(t)); demoTimers=[]; }
+
+function runDemo(ind){
+  clearDemo();
+  const stage=document.getElementById('stage');
+  const body=document.getElementById('stageBody');
+  document.getElementById('stageT').textContent=ind.t;
+  stage.classList.add('show');
+  body.innerHTML='';
+  const steps=DEMO_SCRIPT[ind.id];
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  stage.scrollIntoView({behavior:'smooth',block:'center'});
+
+  let delay=reduce?0:350;
+  steps.forEach((s,idx)=>{
+    demoTimers.push(setTimeout(()=>{
+      // show a brief "thinking" shimmer before work/done steps
+      const el=document.createElement('div');
+      el.className='step '+s.type;
+      el.style.animationDelay='0s';
+      const icon = s.type==='in' ? '→' : (s.type==='work' ? '◆' : '✓');
+      let inner=`<div class="ic">${icon}</div><div class="sx"><div class="sl">${s.l}</div><div class="st">${s.t}</div>`;
+      if(s.result){ inner+=`<div class="result">${s.result}</div>`; }
+      inner+=`</div>`;
+      el.innerHTML=inner;
+      body.appendChild(el);
+      el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }, delay));
+    delay += reduce?0:(s.type==='done'?1100:950);
+  });
+  // closing line: this is just one workflow
+  demoTimers.push(setTimeout(()=>{
+    const more=document.createElement('div');
+    more.className='demo-more';
+    more.innerHTML=`This is just <b>one</b> workflow. Applied Intelligence builds dozens like it around your business — imagine what more it could win for you.`;
+    body.appendChild(more);
+    more.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }, delay));
+}
+
+function showDemo(){ buildIndGrid(); go('s3'); document.getElementById('stage').classList.remove('show'); }
+
+/* deep-link: #demo opens demo */
+if(location.hash==='#demo'){ showDemo(); }
+</script>
+</body>
+</html>
